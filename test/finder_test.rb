@@ -64,6 +64,11 @@ class FinderTest < ActiveRecordTestCase
     Topic.paginate :page => 2, :per_page => 1, :first_page => 2
   end
   
+  def test_paginate_with_first_page_on_page_1
+    Topic.expects(:find).with(:all, {:offset => 0, :limit => 2}).returns([])
+    Topic.paginate :page => 1, :per_page => 1, :first_page => 2
+  end  
+  
   def test_paginate_with_order
     entries = Topic.paginate :page => 1, :order => 'created_at desc'
     expected = [topics(:futurama), topics(:harvey_birdman), topics(:rails), topics(:ar)].reverse
