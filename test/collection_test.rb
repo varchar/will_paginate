@@ -1,5 +1,6 @@
-require 'helper'
-require 'will_paginate/array'
+require "#{File.dirname(__FILE__)}/helper"
+require "#{File.dirname(__FILE__)}/../lib/will_paginate/array"
+require 'ruby-debug'
 
 class ArrayPaginationTest < Test::Unit::TestCase
   
@@ -43,7 +44,7 @@ class ArrayPaginationTest < Test::Unit::TestCase
 
   def test_paginated_collection
     entries = %w(a b c)
-    collection = create(2, 3, 10) do |pager|
+    collection = create(2, 3, 3, 10) do |pager|
       assert_equal entries, pager.replace(entries)
     end
 
@@ -57,24 +58,24 @@ class ArrayPaginationTest < Test::Unit::TestCase
   end
 
   def test_previous_next_pages
-    collection = create(1, 1, 3)
+    collection = create(1, 1, 2, 3)
     assert_nil collection.previous_page
     assert_equal 2, collection.next_page
     
-    collection = create(2, 1, 3)
+    collection = create(2, 1, 1, 3)
     assert_equal 1, collection.previous_page
     assert_equal 3, collection.next_page
     
-    collection = create(3, 1, 3)
+    collection = create(3, 1, 3, 3)
     assert_equal 2, collection.previous_page
     assert_nil collection.next_page
   end
 
   def test_out_of_bounds
-    entries = create(2, 3, 2){}
+    entries = create(2, 3, 3, 2){}
     assert entries.out_of_bounds?
     
-    entries = create(1, 3, 2){}
+    entries = create(1, 3, 3, 2){}
     assert !entries.out_of_bounds?
   end
 
@@ -83,9 +84,9 @@ class ArrayPaginationTest < Test::Unit::TestCase
       # collection is shorter than limit
       pager.replace array
     end
-    assert_equal 8, entries.total_entries
+    assert_equal 5, entries.total_entries
     
-    entries = create(2, 5, 10) do |pager|
+    entries = create(2, 5, 5,10) do |pager|
       # collection is shorter than limit, but we have an explicit count
       pager.replace array
     end
@@ -129,11 +130,11 @@ class ArrayPaginationTest < Test::Unit::TestCase
   end
 
   private
-    def create(page = 2, limit = 5, total = nil, &block)
+    def create(page = 2, limit = 5, first_page = 2, total = nil, &block)
       if block_given?
-        WillPaginate::Collection.create(page, limit, total, &block)
+        WillPaginate::Collection.create(page, limit, first_page, total, &block)
       else
-        WillPaginate::Collection.new(page, limit, total)
+        WillPaginate::Collection.new(page, limit, first_page, total)
       end
     end
 

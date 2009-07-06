@@ -1,5 +1,5 @@
 require 'active_support'
-require 'will_paginate/core_ext'
+require "#{File.dirname(__FILE__)}/will_paginate/core_ext"
 
 # = You *will* paginate!
 #
@@ -31,7 +31,7 @@ module WillPaginate
     # with associations
     def enable_activerecord
       return if ActiveRecord::Base.respond_to? :paginate
-      require 'will_paginate/finder'
+      require "#{File.dirname(__FILE__)}/will_paginate/finder"
       ActiveRecord::Base.send :include, Finder
 
       # support pagination on associations

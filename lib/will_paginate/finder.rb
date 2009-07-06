@@ -1,4 +1,4 @@
-require 'will_paginate/core_ext'
+require "#{File.dirname(__FILE__)}/core_ext"
 
 module WillPaginate
   # A mixin for ActiveRecord::Base. Provides +per_page+ class method
@@ -63,7 +63,7 @@ module WillPaginate
       # and +count+ calls.
       def paginate(*args)
         options = args.pop
-        page, per_page, total_entries = wp_parse_options(options)
+        page, per_page, first_page, total_entries = wp_parse_options(options)
         finder = (options[:finder] || 'find').to_s
 
         if finder == 'find'
@@ -73,8 +73,8 @@ module WillPaginate
           args.unshift(:all) if args.empty?
         end
 
-        WillPaginate::Collection.create(page, per_page, total_entries) do |pager|
-          count_options = options.except :page, :per_page, :total_entries, :finder
+        WillPaginate::Collection.create(page, per_page, first_page, total_entries) do |pager|
+          count_options = options.except :page, :per_page, :total_entries, :finder, :first_page
           find_options = count_options.except(:count).update(:offset => pager.offset, :limit => pager.per_page) 
           
           args << find_options
@@ -247,10 +247,11 @@ module WillPaginate
           raise ArgumentError, ':count and :total_entries are mutually exclusive'
         end
 
-        page     = options[:page] || 1
-        per_page = options[:per_page] || self.per_page
-        total    = options[:total_entries]
-        [page, per_page, total]
+        page           = options[:page] || 1
+        per_page       = options[:per_page] || self.per_page
+        first_page     = options[:first_page] || per_page        
+        total          = options[:total_entries]
+        [page, per_page, first_page, total]
       end
 
     private

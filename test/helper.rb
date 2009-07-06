@@ -4,7 +4,7 @@ require 'rubygems'
 # gem install redgreen for colored test output
 begin require 'redgreen'; rescue LoadError; end
 
-require 'boot' unless defined?(ActiveRecord)
+require "#{File.dirname(__FILE__)}/boot" unless defined?(ActiveRecord)
 
 class Test::Unit::TestCase
   protected

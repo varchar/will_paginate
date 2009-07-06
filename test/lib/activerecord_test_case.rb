@@ -1,4 +1,4 @@
-require 'lib/activerecord_test_connector'
+require "#{File.dirname(__FILE__)}/activerecord_test_connector"
 
 class ActiveRecordTestCase < Test::Unit::TestCase
   if defined?(ActiveSupport::Testing::SetupAndTeardown)

@@ -1,5 +1,5 @@
 require 'set'
-require 'will_paginate/array'
+require "#{File.dirname(__FILE__)}/array"
 
 # helper to check for method existance in ruby 1.8- and 1.9-compatible way
 # because `methods`, `instance_methods` and others return strings in 1.8 and symbols in 1.9

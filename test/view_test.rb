@@ -332,7 +332,7 @@ class ViewTest < WillPaginate::ViewTestCase
   end
 
   def test_deprecation_notices_with_page_count
-    collection = LegacyCollection.new(1, 1, 2)
+    collection = LegacyCollection.new(1, 1, 1, 2)
 
     assert_deprecated collection.class.name do
       paginate collection

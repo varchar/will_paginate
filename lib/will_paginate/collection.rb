@@ -40,18 +40,18 @@ module WillPaginate
   #   
   #   # WillPaginate::Collection is now available for use
   class Collection < Array
-    attr_reader :current_page, :per_page, :total_entries, :total_pages
+    attr_reader :current_page, :per_page, :total_entries, :total_pages, :first_page
 
     # Arguments to the constructor are the current page number, per-page limit
     # and the total number of entries. The last argument is optional because it
     # is best to do lazy counting; in other words, count *conditionally* after
     # populating the collection using the +replace+ method.
-    def initialize(page, per_page, total = nil)
+    def initialize(page, per_page, first_page, total = nil)
       @current_page = page.to_i
       raise InvalidPage.new(page, @current_page) if @current_page < 1
       @per_page = per_page.to_i
       raise ArgumentError, "`per_page` setting cannot be less than 1 (#{@per_page} given)" if @per_page < 1
-      
+      @first_page = first_page
       self.total_entries = total if total
     end
 
@@ -82,8 +82,8 @@ module WillPaginate
     #
     # The Array#paginate API has since then changed, but this still serves as a
     # fine example of WillPaginate::Collection usage.
-    def self.create(page, per_page, total = nil)
-      pager = new(page, per_page, total)
+    def self.create(page, per_page, first_page, total = nil)
+      pager = new(page, per_page, first_page, total)
       yield pager
       pager
     end
@@ -100,7 +100,9 @@ module WillPaginate
     # the offset is 30. This property is useful if you want to render ordinals
     # side by side with records in the view: simply start with offset + 1.
     def offset
-      (current_page - 1) * per_page
+      start_at = (current_page - 1) * per_page
+      start_at = start_at + (first_page - per_page) unless current_page == 1
+      start_at
     end
 
     # current_page - 1 or nil if there is no previous page
@@ -136,8 +138,15 @@ module WillPaginate
       
       # The collection is shorter then page limit? Rejoice, because
       # then we know that we are on the last page!
-      if total_entries.nil? and length < per_page and (current_page == 1 or length > 0)
-        self.total_entries = offset + length
+      if total_entries.nil? 
+        if (length < per_page && current_page != 1) || (length < first_page && current_page == 1)
+          if length > 0
+            self.total_entries = length if current_page == 1
+            self.total_entries = (per_page * current_page) + (first_page - per_page) + (length - per_page) if current_page != 1
+          elsif current_page == 1
+            self.total_entries = length
+          end
+        end
       end
 
       result

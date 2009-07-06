@@ -1,7 +1,8 @@
-require 'helper'
-require 'lib/activerecord_test_case'
+require "#{File.dirname(__FILE__)}/helper"
+require "#{File.dirname(__FILE__)}/lib/activerecord_test_case"
+require 'ruby-debug'
 
-require 'will_paginate'
+require "#{File.dirname(__FILE__)}/../lib/will_paginate"
 WillPaginate.enable_activerecord
 WillPaginate.enable_named_scope
 
@@ -53,6 +54,14 @@ class FinderTest < ActiveRecordTestCase
     assert_equal 11, entries.total_entries
     assert_equal 5, entries.size
     assert_equal 3, entries.total_pages
+  end
+  
+  ## this allows for the first page of pagination to be different than the rest of the pages
+  ## often I only show 3 items in a small module on my page and then link to a dedicated pagination
+  ## page that shows 30 or more items per page and need page 2 to start at item 4 and run through 33
+  def test_paginate_with_first_page
+    Topic.expects(:find).with(:all, {:offset => 2, :limit => 1}).returns([])
+    Topic.paginate :page => 2, :per_page => 1, :first_page => 2
   end
   
   def test_paginate_with_order
