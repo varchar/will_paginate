@@ -118,7 +118,11 @@ module WillPaginate
     # sets the <tt>total_entries</tt> property and calculates <tt>total_pages</tt>
     def total_entries=(number)
       @total_entries = number.to_i
-      @total_pages   = (@total_entries / per_page.to_f).ceil
+       if @total_entries - first_page < 0
+         @total_pages =  1
+       else
+         @total_pages = ((@total_entries - first_page)/per_page.to_f).ceil + 1
+       end
     end
 
     # This is a magic wrapper for the original Array#replace method. It serves

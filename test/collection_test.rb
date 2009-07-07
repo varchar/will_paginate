@@ -41,6 +41,14 @@ class ArrayPaginationTest < Test::Unit::TestCase
       [].paginate({}, 5)
     end
   end
+  
+  def test_total_pages_with_a_custome_first_page
+    entries = %w(a b c)
+    collection = create(2, 3, 1, 11) do |pager|
+      assert_equal entries, pager.replace(entries)
+    end    
+    assert_equal 5, collection.total_pages
+  end
 
   def test_paginated_collection
     entries = %w(a b c)
